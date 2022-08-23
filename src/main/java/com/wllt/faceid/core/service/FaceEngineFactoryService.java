@@ -114,6 +114,36 @@ public class FaceEngineFactoryService {
     }
 
     /**
+     * 获取两人脸相似度
+     * @return
+     */
+    public float FaceSimilarity(byte [] face1,byte [] face2){
+        FaceEngine faceEngine=null;
+        try {
+            faceEngine = genericObjectPool.borrowObject();
+
+            FaceFeature FaceFeature1 = new FaceFeature();
+            FaceFeature1.setFeatureData(face1);
+
+            FaceFeature FaceFeature2 = new FaceFeature();
+            FaceFeature2.setFeatureData(face2);
+
+            FaceSimilar faceSimilar = new FaceSimilar();
+            faceEngine.compareFaceFeature(FaceFeature1,FaceFeature2,faceSimilar);
+            return faceSimilar.getScore();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (faceEngine != null) {
+                genericObjectPool.returnObject(faceEngine);
+            }
+        }
+        return 0;
+    }
+
+
+
+    /**
      * 人脸对比获取相似度最高的
      *
      * @param faceFeature
