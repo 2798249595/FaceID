@@ -63,6 +63,7 @@ public class Customer implements Serializable {
     /**
      * 是否可以匿名使⽤1可以0不⾏
      */
-    private String isanonymous;
+    private int isanonymous;
+
     private static final long serialVersionUID = 1L;
 }

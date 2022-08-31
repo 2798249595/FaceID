@@ -45,7 +45,7 @@ public class FaceController {
     @Value("${config.resource-path}")
     String FacePath;
 
-    private static ExecutorService service = Executors.newFixedThreadPool(500);
+    private static ExecutorService service = Executors.newFixedThreadPool(100);
 
     /**
      * 人脸更新或插入接口
@@ -88,7 +88,6 @@ public class FaceController {
         List<AcceptUserVO2> list = JSONUtil.parseObj(data).getBeanList("list", AcceptUserVO2.class);
         System.out.println(list.size());
         for (AcceptUserVO2 acceptUserVo:list){
-            Thread.sleep(20);
             System.out.println(acceptUserVo);
             service.submit(() -> {
                 User user = userService.query().eq("uid", acceptUserVo.getId()).one();
@@ -130,6 +129,7 @@ public class FaceController {
      */
     @RequestMapping(value = "/query", method = RequestMethod.POST)
     public SaResult Query(@NonNull @RequestBody String file) throws ExecutionException, InterruptedException {
+        log.info("人脸识别");
         if (file.length() < 30) {
             return SaResult.error("参数格式错误");
         }
@@ -151,6 +151,7 @@ public class FaceController {
             return SaResult.error("未识到人脸");
         }
         List<UserVO> userVOs = factoryService.compareFaceFeature(bytes);
+        log.info("人脸识别成功");
         if (userVOs == null) {
             log.info("查无此人");
             return SaResult.error("查无此人");
@@ -191,7 +192,7 @@ public class FaceController {
         }
         //获取相似度
         float similarity = factoryService.FaceSimilarity(user.getFace_feature(), bytes);
-        return SaResult.data(similarity);
+        return SaResult.data(String.valueOf(similarity));
     }
 
 

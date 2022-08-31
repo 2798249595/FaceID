@@ -41,7 +41,7 @@ public class FaceEngineFactoryService {
     private String SdkPath;
 
 
-    private Integer threadPoolSize = 3000;
+    private Integer threadPoolSize = 50;
 
     //相似度阈值
     private float passRate = 0.8F;
@@ -55,7 +55,7 @@ public class FaceEngineFactoryService {
 
     @PostConstruct
     public void init() {
-        executorService = Executors.newFixedThreadPool(threadPoolSize*2);
+        executorService = Executors.newFixedThreadPool(threadPoolSize);
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
         config.setMaxIdle(threadPoolSize);
         config.setMaxTotal(threadPoolSize);
@@ -157,7 +157,7 @@ public class FaceEngineFactoryService {
 
         List<User> userList = userService.query().list();
         //数据分割
-        List<List<User>> UserLists = Lists.partition(userList, 500);
+        List<List<User>> UserLists = Lists.partition(userList, 1000);
 
         CompletionService<List<UserVO>> completionService = new ExecutorCompletionService(executorService);
         //提交任务

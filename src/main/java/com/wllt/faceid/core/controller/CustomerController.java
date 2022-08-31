@@ -41,7 +41,6 @@ public class CustomerController {
      */
     @RequestMapping("/insertorupdate")
     public SaResult InsertORUpdate(@NonNull @RequestBody Customer customer) {
-        System.out.println(customer);
         Customer customer1 = customerService.getById(1);
         customer.setId(1);
         if (customer1 == null) {
