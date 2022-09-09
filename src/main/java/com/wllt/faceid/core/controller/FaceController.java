@@ -9,9 +9,11 @@ import com.arcsoft.face.toolkit.ImageInfo;
 import com.wllt.faceid.core.db.domain.User;
 import com.wllt.faceid.core.db.service.UserService;
 import com.wllt.faceid.core.service.FaceEngineFactoryService;
+import com.wllt.faceid.core.utils.FaceUtil;
 import com.wllt.faceid.core.utils.SaResult;
 import com.wllt.faceid.core.vo.AcceptUserVO1;
 import com.wllt.faceid.core.vo.AcceptUserVO2;
+import com.wllt.faceid.core.vo.FaceVo;
 import com.wllt.faceid.core.vo.UserVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -41,6 +45,9 @@ public class FaceController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    FaceUtil faceUtil;
+
     //人脸临时目录
     @Value("${config.resource-path}")
     String FacePath;
@@ -54,40 +61,40 @@ public class FaceController {
      */
     @RequestMapping(value = "/updateorinsert", method = RequestMethod.POST)
     public void UpdateORInsert(@RequestBody AcceptUserVO1 acceptUserVo) {
-            User user = userService.query().eq("uid", acceptUserVo.getUid()).one();
-            byte[] bytes = HttpDownloader.downloadBytes(acceptUserVo.getUrl());
-            //获取人脸特征
-            ImageInfo imageInfo = ImageFactory.getRGBData(bytes);
-            byte[] FaceData = factoryService.extractFaceFeature(imageInfo);
-            //新增
-            if (user == null) {
-                User user1 = new User();
-                user1.setId(0);
-                user1.setName(acceptUserVo.getName());
-                user1.setNumber(acceptUserVo.getNumber());
-                user1.setUid(acceptUserVo.getUid());
-                user1.setFace_feature(FaceData);
-                userService.save(user1);
+        User user = userService.query().eq("uid", acceptUserVo.getUid()).one();
+        byte[] bytes = HttpDownloader.downloadBytes(acceptUserVo.getUrl());
+        //获取人脸特征
+        ImageInfo imageInfo = ImageFactory.getRGBData(bytes);
+        byte[] FaceData = factoryService.extractFaceFeature(imageInfo);
+        //新增
+        if (user == null) {
+            User user1 = new User();
+            user1.setId(0);
+            user1.setName(acceptUserVo.getName());
+            user1.setNumber(acceptUserVo.getNumber());
+            user1.setUid(acceptUserVo.getUid());
+            user1.setFace_feature(FaceData);
+            userService.save(user1);
 //                return SaResult.ok();
-                //更改
-            } else {
-                userService.update()
-                        .eq("id", user.getId())
-                        .set("face_feature", FaceData)
-                        .update();
+            //更改
+        } else {
+            userService.update()
+                    .eq("id", user.getId())
+                    .set("face_feature", FaceData)
+                    .update();
 //                return SaResult.ok();
-            }
+        }
     }
 
     /**
-     *批量下载人脸
+     * 批量下载人脸
      */
     @PostMapping(value = "/updateorinsertlist")
     public SaResult UpdateORInsertList(@RequestBody JSONObject jsonObject) throws InterruptedException {
         Object data = jsonObject.get("data");
         List<AcceptUserVO2> list = JSONUtil.parseObj(data).getBeanList("list", AcceptUserVO2.class);
         System.out.println(list.size());
-        for (AcceptUserVO2 acceptUserVo:list){
+        for (AcceptUserVO2 acceptUserVo : list) {
             System.out.println(acceptUserVo);
             service.submit(() -> {
                 User user = userService.query().eq("uid", acceptUserVo.getId()).one();
@@ -115,10 +122,6 @@ public class FaceController {
         }
         return SaResult.ok();
     }
-
-
-
-
 
 
     /**
@@ -162,11 +165,12 @@ public class FaceController {
 
     /**
      * 根据id对比人脸是否是同一个人
+     *
      * @param JSON
      * @return
      */
     @PostMapping(value = "/querybyid")
-    public SaResult QueryByid(@RequestBody String JSON){
+    public SaResult QueryByid(@RequestBody String JSON) {
         JSONObject jsonObject = JSONUtil.parseObj(JSON);
         String file = jsonObject.getStr("file");
         Integer id = jsonObject.getInt("id");
@@ -186,8 +190,8 @@ public class FaceController {
         if (bytes == null) {
             return SaResult.error("未识到人脸");
         }
-        User user = userService.query().eq("uid",id).one();
-        if (user==null){
+        User user = userService.query().eq("uid", id).one();
+        if (user == null) {
             return SaResult.error("id错误");
         }
         //获取相似度
@@ -195,7 +199,22 @@ public class FaceController {
         return SaResult.data(String.valueOf(similarity));
     }
 
-
+    /**
+     * 获取人脸位置
+     *
+     * @param path
+     * @return
+     */
+    @GetMapping("/Place")
+    public SaResult FacePlace(String path) {
+        File file = new File(path);
+        System.out.println(file.getPath());
+        if (!file.exists()) {
+            return SaResult.error("文件不存在");
+        }
+        System.out.println("图片路径" + path);
+        return SaResult.data(faceUtil.place(path));
+    }
 
 
     /**

@@ -99,6 +99,12 @@
             <version>1.2.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.bytedeco.javacpp-presets</groupId>
+            <artifactId>opencv-platform</artifactId>
+            <version>4.0.1-1.4.4</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.arcsoft.face</groupId>
