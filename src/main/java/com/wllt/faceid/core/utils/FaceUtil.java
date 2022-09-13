@@ -42,7 +42,7 @@ public class FaceUtil {
         opencv_core.RectVector rectVector = new opencv_core.RectVector();
         classifier.detectMultiScale(mat2, rectVector);
         opencv_core.Rect[] Face = rectVector.get();
-        if (Face == null) {
+        if (Face == null||Face.length==0) {
             return null;
         }
         opencv_core.Rect rect = Face[0];

@@ -208,12 +208,14 @@ public class FaceController {
     @GetMapping("/Place")
     public SaResult FacePlace(String path) {
         File file = new File(path);
-        System.out.println(file.getPath());
         if (!file.exists()) {
             return SaResult.error("文件不存在");
         }
-        System.out.println("图片路径" + path);
-        return SaResult.data(faceUtil.place(path));
+        FaceVo place = faceUtil.place(path);
+        if (place==null){
+            return SaResult.error("没有找到人脸");
+        }
+        return SaResult.data(place);
     }
 
 
