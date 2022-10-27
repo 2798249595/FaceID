@@ -1,6 +1,7 @@
 package com.wllt.faceid.core.controller;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.http.HttpDownloader;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -9,12 +10,10 @@ import com.arcsoft.face.toolkit.ImageInfo;
 import com.wllt.faceid.core.db.domain.User;
 import com.wllt.faceid.core.db.service.UserService;
 import com.wllt.faceid.core.service.FaceEngineFactoryService;
+import com.wllt.faceid.core.utils.FaceThree;
 import com.wllt.faceid.core.utils.FaceUtil;
 import com.wllt.faceid.core.utils.SaResult;
-import com.wllt.faceid.core.vo.AcceptUserVO1;
-import com.wllt.faceid.core.vo.AcceptUserVO2;
-import com.wllt.faceid.core.vo.FaceVo;
-import com.wllt.faceid.core.vo.UserVO;
+import com.wllt.faceid.core.vo.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,6 +48,9 @@ public class FaceController {
 
     @Autowired
     FaceUtil faceUtil;
+
+    @Autowired
+    FaceThree faceThree;
 
     //人脸临时目录
     @Value("${config.resource-path}")
@@ -205,19 +209,33 @@ public class FaceController {
      * @param path
      * @return
      */
-    @GetMapping("/Place")
+/*    @GetMapping("/Place")
     public SaResult FacePlace(String path) {
         File file = new File(path);
         if (!file.exists()) {
             return SaResult.error("文件不存在");
         }
         FaceVo place = faceUtil.place(path);
-        if (place==null){
+        if (place == null) {
             return SaResult.error("没有找到人脸");
         }
         return SaResult.data(place);
-    }
+    }*/
 
+
+    /**
+     * 传入图片获取人脸3d模型
+     * @param img 图片base64
+     * @return
+     */
+    @PostMapping("/three")
+    public SaResult FaceThree(@RequestBody String img) {
+        Face three = faceThree.getThree(img);
+        Map<String, String> map = new HashMap<>(2);
+        map.put("model", new String(Base64Decoder.decode(three.getObj_file())));
+        map.put("texture", three.getTexture_img());
+        return SaResult.data(map);
+    }
 
     /**
      * 截取base64编码的头

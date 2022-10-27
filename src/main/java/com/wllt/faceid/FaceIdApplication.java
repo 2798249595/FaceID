@@ -14,8 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class FaceIdApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
         SpringApplication.run(FaceIdApplication.class, args);
-        System.setProperty("org.bytedeco.javacpp.maxphysicalbytes", "0");
-        System.setProperty("org.bytedeco.javacpp.maxbytes", "0");
+/*        System.setProperty("org.bytedeco.javacpp.maxphysicalbytes", "0");
+        System.setProperty("org.bytedeco.javacpp.maxbytes", "0");*/
     }
 //wmic csproduct get UUID
 

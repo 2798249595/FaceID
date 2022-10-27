@@ -1,7 +1,7 @@
 package com.wllt.faceid.core.utils;
 
 import com.wllt.faceid.core.vo.FaceVo;
-import org.bytedeco.javacpp.*;
+//import org.bytedeco.javacpp.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 @Component
 public class FaceUtil {
 
+/*
     private opencv_objdetect.CascadeClassifier classifier;
 
     @Value("${config.path-sdk}")
@@ -26,12 +27,14 @@ public class FaceUtil {
         classifier = new opencv_objdetect.CascadeClassifier(path+"\\haarcascade_frontalface_default.xml");
     }
 
-    /**
+    */
+/**
      * 获取人脸位置
      *
      * @param Path 图片路径
      * @return
-     */
+     *//*
+
     public FaceVo place(String Path) {
         opencv_core.Mat inMat = opencv_imgcodecs.imread(Path);
         opencv_core.Mat mat1 = new opencv_core.Mat();
@@ -47,11 +50,13 @@ public class FaceUtil {
         }
         opencv_core.Rect rect = Face[0];
         System.out.println("脸的宽" + rect.width() + " 脸的高" + rect.height());
+*/
 /*        opencv_imgproc.rectangle(inMat,
                 new opencv_core.Point(rect.x(), rect.y()),
                 new opencv_core.Point(rect.x() + rect.width(), rect.y() + rect.height()),
                 new opencv_core.Scalar(0, 255, 0, 0));
-        opencv_imgcodecs.imwrite("D:\\FaceDetect\\11.jpg", inMat);*/
+        opencv_imgcodecs.imwrite("D:\\FaceDetect\\11.jpg", inMat);*//*
+
         FaceVo faceVo = new FaceVo();
         faceVo.setX(rect.x());
         faceVo.setY(rect.y());
@@ -59,5 +64,6 @@ public class FaceUtil {
         faceVo.setHeight(rect.height());
         return faceVo;
     }
+*/
 
 }
