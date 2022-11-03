@@ -48,6 +48,4 @@ public class FaceThree {
                 .body();
         return JSONUtil.toBean(JSONUtil.parseObj(body), Face.class);
     }
-
-
 }

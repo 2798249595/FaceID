@@ -2,6 +2,7 @@ package com.wllt.faceid.core.controller;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.codec.Base64Decoder;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpDownloader;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -94,7 +95,8 @@ public class FaceController {
      * 批量下载人脸
      */
     @PostMapping(value = "/updateorinsertlist")
-    public SaResult UpdateORInsertList(@RequestBody JSONObject jsonObject) throws InterruptedException {
+    public SaResult UpdateORInsertList(@RequestBody JSONObject jsonObject){
+        log.info(jsonObject.toString());
         Object data = jsonObject.get("data");
         List<AcceptUserVO2> list = JSONUtil.parseObj(data).getBeanList("list", AcceptUserVO2.class);
         System.out.println(list.size());
@@ -225,11 +227,15 @@ public class FaceController {
 
     /**
      * 传入图片获取人脸3d模型
+     *
      * @param img 图片base64
      * @return
      */
     @PostMapping("/three")
     public SaResult FaceThree(@RequestBody String img) {
+        if (StrUtil.isEmpty(img)) {
+            return SaResult.error("空参数");
+        }
         Face three = faceThree.getThree(img);
         Map<String, String> map = new HashMap<>(2);
         map.put("model", new String(Base64Decoder.decode(three.getObj_file())));

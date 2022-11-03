@@ -82,6 +82,7 @@ public class FaceEngineFactoryService {
         FaceEngineFactory factory = new FaceEngineFactory(AppId, SdkKey, SdkPath, engineConfiguration);
         //底层算法对象池
         genericObjectPool = new GenericObjectPool(factory, config);
+        log.info("人脸识别初始化完成");
     }
 
     /**
