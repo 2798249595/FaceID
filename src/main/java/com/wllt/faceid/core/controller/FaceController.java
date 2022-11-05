@@ -245,8 +245,8 @@ public class FaceController {
         }
         Face three = faceThree.getThree(list);
         log.info(three.getError_message());
-        FileUtil.writeUtf8String(new String(Base64Decoder.decode(three.getObj_file())), "D:\\model.obj");
-        Base64.decodeToFile(three.getTexture_img(), new File("D:\\Texture.jpg"));
+       /* FileUtil.writeUtf8String(new String(Base64Decoder.decode(three.getObj_file())), "D:\\model.obj");
+        Base64.decodeToFile(three.getTexture_img(), new File("D:\\Texture.jpg"));*/
         Map<String, String> map = new HashMap<>(2);
         map.put("model", new String(Base64Decoder.decode(three.getObj_file())));
         map.put("texture", three.getTexture_img());
