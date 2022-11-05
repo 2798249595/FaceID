@@ -2,8 +2,11 @@ package com.wllt.faceid.core.controller;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.codec.Base64Decoder;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpDownloader;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.arcsoft.face.toolkit.ImageFactory;
@@ -24,6 +27,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +99,7 @@ public class FaceController {
      * 批量下载人脸
      */
     @PostMapping(value = "/updateorinsertlist")
-    public SaResult UpdateORInsertList(@RequestBody JSONObject jsonObject){
+    public SaResult UpdateORInsertList(@RequestBody JSONObject jsonObject) {
         log.info(jsonObject.toString());
         Object data = jsonObject.get("data");
         List<AcceptUserVO2> list = JSONUtil.parseObj(data).getBeanList("list", AcceptUserVO2.class);
@@ -228,15 +232,21 @@ public class FaceController {
     /**
      * 传入图片获取人脸3d模型
      *
-     * @param img 图片base64
+     * @param json 图片base64
      * @return
      */
     @PostMapping("/three")
-    public SaResult FaceThree(@RequestBody String img) {
-        if (StrUtil.isEmpty(img)) {
-            return SaResult.error("空参数");
+    public SaResult FaceThree(@RequestBody String json) {
+        JSONObject jsonObject = JSONUtil.parseObj(json);
+        JSONArray array = jsonObject.getJSONArray("imageBase64");
+        List<String> list = array.toList(String.class);
+        if (list.isEmpty()) {
+            return SaResult.error("参数错误");
         }
-        Face three = faceThree.getThree(img);
+        Face three = faceThree.getThree(list);
+        log.info(three.getError_message());
+        FileUtil.writeUtf8String(new String(Base64Decoder.decode(three.getObj_file())), "D:\\model.obj");
+        Base64.decodeToFile(three.getTexture_img(), new File("D:\\Texture.jpg"));
         Map<String, String> map = new HashMap<>(2);
         map.put("model", new String(Base64Decoder.decode(three.getObj_file())));
         map.put("texture", three.getTexture_img());
